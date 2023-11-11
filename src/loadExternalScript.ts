@@ -32,7 +32,6 @@ export function removeScript(scriptOrSrc) {
 
 export function loadScript(src) {
   return new Promise((resolve, reject) => {
-    console.log(src)
     let script = document.querySelector(`script[src="${src}"]`)
     
     if (script && script.hasAttribute('data-loaded')) {

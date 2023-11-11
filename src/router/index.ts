@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomePage from '../pages/HomePage.vue'
-import LHCFormPage from '../pages/LHCFormPage.vue'
+import HomePage from '@/pages/HomePage.vue'
+import LForm from '@/components/lforms/LForm.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,7 +13,7 @@ const router = createRouter({
     {
       path: '/form',
       name: 'form',
-      component: LHCFormPage,
+      component: LForm,
       children: []
     },
     // {
