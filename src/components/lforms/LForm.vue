@@ -1,6 +1,6 @@
 <script async setup lang="ts">
 import { useLFormStore } from '@/stores/lform'
-import { onUnmounted, onMounted } from 'vue'
+import { onUnmounted, onMounted, ref } from 'vue'
 import { loadScript, removeScript } from '@/loadExternalScript'
 
 const lFormStore = useLFormStore()
@@ -11,16 +11,24 @@ const lhcAssetsSrc = 'https://clinicaltables.nlm.nih.gov/lforms-versions/34.0.0/
 const lhcFormsSrc = 'https://clinicaltables.nlm.nih.gov/lforms-versions/34.0.0/webcomponent/lhc-forms.js'
 const lformsFhirAllSrc = 'https://clinicaltables.nlm.nih.gov/lforms-versions/34.0.0/fhir/lformsFHIRAll.min.js'
 onMounted(async () => {
+  await lFormStore.loadFhirQuestionnaires()
   await loadScript(lhcAssetsSrc)
   await loadScript(lhcFormsSrc)
   await loadScript(lformsFhirAllSrc)
-  const options = { prepopulate: true }
-  LForms.Util.addFormToPage(lFormStore.formDef, 'lhcFormContainer', options);
 })
 
 onUnmounted(() => removeScript(lhcAssetsSrc))
 onUnmounted(() => removeScript(lhcFormsSrc))
 onUnmounted(() => removeScript(lformsFhirAllSrc))
+
+const selectedForm = ref('')
+const setFormDef = () => {
+  lFormStore.setFormDef(selectedForm.value)
+  if (selectedForm.value) {
+    const options = { prepopulate: true }
+    LForms.Util.addFormToPage(lFormStore.formDef, 'lhcFormContainer', options);
+  }
+}
 
 const saveFormData = () => {
   const formInput = LForms.Util.getFormFHIRData('QuestionnaireResponse', 'R4')
@@ -28,26 +36,57 @@ const saveFormData = () => {
 }
 
 const resetFormData = () => {
-  
+  selectedForm.value = ''
+  setFormDef()
 }
 </script>
 
 <template>
   <div class="toolbar">
-    <button @click="saveFormData">Save</button>
-    <button @click="resetFormData">Reset</button>
+    <div class="toolbar-left">
+      <select 
+        v-model="selectedForm" 
+        @change.prevent="setFormDef"
+      >
+        <option disabled value="">Choose a questionnaire</option>
+        <option v-for="questionnaire in lFormStore.fhirQuestionnaires" 
+          :key="questionnaire.id"
+          :value="questionnaire.id"
+        >
+          {{ questionnaire.name || questionnaire.title }}
+        </option>
+      </select>
+    </div>
+    <div class="toolbar-right">
+      <button @click="saveFormData" class="save-btn">Save</button>
+      <button @click="resetFormData" class="reset-btn">Reset</button>
+    </div>
   </div>
 
-  <div id="lhcFormContainer"></div>
+  <div v-show="lFormStore.formDef" id="lhcFormContainer"></div>
 </template>
 
 <style scoped>
 .toolbar {
   display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
+  justify-content: space-between;
   padding: 0.25rem;
   align-items: center;
-  margin-bottom: 0;
+  margin-top: 0.25rem;
+}
+
+.toolbar-left {
+
+}
+
+.toolbar-right {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.save-btn {
+}
+
+.reset-btn {
 }
 </style>

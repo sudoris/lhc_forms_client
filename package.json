@@ -13,7 +13,9 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@types/fhir": "^0.0.39",
     "axios": "^1.6.1",
+    "bootstrap": "^5.3.2",
     "lforms": "^34.0.1",
     "pinia": "^2.1.7",
     "vue": "^3.3.4",

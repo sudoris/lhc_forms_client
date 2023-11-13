@@ -21,6 +21,6 @@ import { RouterLink, RouterView } from 'vue-router'
   align-items: center;
   margin-bottom: 0;
   color: white;
-  background-color: grey;
+  background-color: rgb(136, 0, 0);
 }
 </style>
