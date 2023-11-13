@@ -12,5 +12,14 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        assetFileNames: "lhc_forms_client/assets/[name]-[hash][extname]",
+        chunkFileNames: "lhc_forms_client/assets/[name]-[hash].js",
+        entryFileNames: "lhc_forms_client/assets/[name]-[hash].js",
+      }
+    }
   }
 })
