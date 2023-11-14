@@ -16,9 +16,9 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        assetFileNames: "lhc_forms_client/assets/[name]-[hash][extname]",
-        chunkFileNames: "lhc_forms_client/assets/[name]-[hash].js",
-        entryFileNames: "lhc_forms_client/assets/[name]-[hash].js",
+        assetFileNames: "[name]-[hash][extname]",
+        chunkFileNames: "[name]-[hash].js",
+        entryFileNames: "[name]-[hash].js",
       }
     }
   }
