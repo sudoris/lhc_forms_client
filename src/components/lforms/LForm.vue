@@ -30,9 +30,29 @@ const setFormDef = () => {
   }
 }
 
+// practioner info
+const practionerFirstName = ref('')
+const practionerLastName = ref('')
+
+// patient info
+const firstName = ref('')
+const lastName = ref('')
+const gender = ref('')
+const birthDate = ref('')
+
 const saveFormData = () => {
   const formInput = LForms.Util.getFormFHIRData('QuestionnaireResponse', 'R4')
-  lFormStore.saveFormData(formInput)
+  const practionerInfo = {
+    firstName: practionerFirstName.value,
+    lastName: practionerLastName.value
+  }
+  const patientInfo = {
+    firstName: firstName.value,
+    lastName: lastName.value,
+    gender: gender.value,
+    birthDate: birthDate.value
+  }
+  lFormStore.saveFormData(formInput, patientInfo, practionerInfo)
 }
 
 const resetFormData = () => {
@@ -42,7 +62,7 @@ const resetFormData = () => {
 </script>
 
 <template>
-  <div class="toolbar">
+  <div class="toolbar mb-2">
     <div class="toolbar-left">
       <select 
         v-model="selectedForm" 
@@ -58,8 +78,45 @@ const resetFormData = () => {
       </select>
     </div>
     <div class="toolbar-right">
-      <button @click="saveFormData" class="save-btn">Save</button>
-      <button @click="resetFormData" class="reset-btn">Reset</button>
+      <button @click="saveFormData" class="btn btn-primary">Save</button>
+      <button @click="resetFormData" class="btn btn-danger">Reset</button>
+    </div>
+  </div>
+
+  <div>
+    <div class="input-group mb-3">
+      <span class="input-group-text" id="practionerFirstName">Practioner First Name</span>
+      <input v-model="practionerFirstName" type="text" class="form-control" placeholder="John" aria-label="First name of practioner" aria-describedby="practionerFirstName">
+    </div>    
+
+    <div class="input-group mb-3">
+      <span class="input-group-text" id="practionerLastName">Practioner Last Name</span>
+      <input v-model="practionerLastName" type="text" class="form-control" placeholder="Smith" aria-label="Last name of practioner" aria-describedby="practionerLastName">
+    </div>  
+
+    <div class="input-group mb-3">
+      <span class="input-group-text" id="firstname">First name</span>
+      <input v-model="firstName" type="text" class="form-control" placeholder="Jane" aria-label="First name" aria-describedby="firstname">
+    </div>
+
+    <div class="input-group mb-3">
+      <span class="input-group-text" id="lastname">Last name</span>
+      <input v-model="lastName" type="text" class="form-control" placeholder="Doe" aria-label="Last name" aria-describedby="lastname">
+    </div>
+
+    <div class="input-group mb-3">
+      <label class="input-group-text" id="gender">Gender</label>
+      <select class="form-select" v-model="gender" aria-label="Gender" aria-describedby="gender">
+        <option selected>Choose...</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+
+    <div class="input-group mb-3">
+      <span class="input-group-text" id="birthDate">birthDate</span>
+      <input v-model="birthDate" type="date" class="form-control" placeholder="YYYY-MM-DD" aria-label="birthDate" aria-describedby="birthDate">
     </div>
   </div>
 

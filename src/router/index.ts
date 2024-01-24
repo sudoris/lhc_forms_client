@@ -1,14 +1,25 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomePage from '@/pages/HomePage.vue'
+import DashBoard from '@/pages/DashBoard.vue'
 import LForm from '@/components/lforms/LForm.vue'
+import { useLFormStore } from '@/stores/lform'
+
+const loadQuestionnaireResponses = async () => {
+  const lFormStore = useLFormStore()
+
+  await lFormStore.loadQuestionnaireResponses()
+
+  // If nothing, undefined or true is returned, the navigation is validated, and the next navigation guard is called.
+  return true
+}
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: HomePage
+      name: 'dashboard',
+      component: DashBoard,
+      beforeEnter: [loadQuestionnaireResponses]
     },
     {
       path: '/form',

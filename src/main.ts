@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
 import './assets/css/lhc.css'
+import './assets/css/bootstrap.min.css'
 import './assets/css/reset.css'
 import './assets/css/index.css'
 
