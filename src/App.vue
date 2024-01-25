@@ -2,8 +2,8 @@
 import { RouterLink, RouterView } from 'vue-router'
 import router from './router';
 
-const toHome = () => {
-  router.push({ name: 'home' })
+const toDashBoard = () => {
+  router.push({ name: 'dashboard' })
 }
 
 const toEdit = () => {
@@ -14,7 +14,7 @@ const toEdit = () => {
 <template>
   <nav>
     <ul class="primary-nav">
-      <li class="nav-item" @click="toHome">
+      <li class="nav-item" @click="toDashBoard">
         LHC Forms Client
       </li>
       <li class="nav-item" @click="toEdit">

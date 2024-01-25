@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import api from '@/api/index.js'
 
 const SYSTEM_URI = 'urn:uuid:0f7533a9-8a99-4666-9a7d-d435937cdef5'
+const baseUrl = 'https://hapi.fhir.org/baseR4'
 
 // import formDefinition from '@/assets/form_defs/fhirPersonalHealthRecord.json'
 
@@ -30,6 +31,15 @@ export const useLFormStore = defineStore('lFormStore', () => {
 
   const formData = ref({})
   const saveFormData = async (data, patientInfo, practitionerInfo) => {
+    if (!formDef.value) {
+      console.log('form definition not found')
+      return
+    }
+
+    if (!data.questionnaire) {
+      data.questionnaire = `${baseUrl}/Questionnaire/${formDef.value.id}`
+    }
+
     if (!data.contained) {
       data.contained = []
     }
