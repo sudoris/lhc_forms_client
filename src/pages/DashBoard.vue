@@ -90,8 +90,8 @@ const handleDelete = (idx, row) => {
     >
       <div class="patient-name">{{ responseList[0].fullName }}  |  {{ responseList[0].gender }}  |  {{ responseList[0].birthDate }} (DOB)</div>
       <el-table :data="responseList" stripe fit>
-        <el-table-column prop="questionnaireType" label="Questionnaire Type" width="180" />
-        <el-table-column prop="authoringPractioner" label="Authored By"/>
+        <el-table-column prop="questionnaireType" label="Questionnaire type" width="180" />
+        <el-table-column prop="authoringPractioner" label="Authored by"/>
         <!-- <el-table-column prop="gender" label="Gender" />
         <el-table-column prop="birthDate" label="Birthdate" /> -->
         <el-table-column prop="lastUpdateTime" label="Last updated" />
