@@ -27,7 +27,15 @@ export function removeScript(scriptOrSrc) {
     script = scriptOrSrc
   }
   
-  if (script) script.parentNode.removeChild(script)
+  if (script) {
+    // lhc forms is holding a reference to child node, which causes the following exception:
+    // DOMException: Failed to execute 'define' on 'CustomElementRegistry': the name "wc-lhc-form" 
+    // has already been used with this registry.
+    
+    // Possible workaround: treat script as a singleton and only load it once when initializing App,
+    // then never remove it until user leaves our site.
+    script.parentNode.removeChild(script)
+  }
 }
 
 export function loadScript(src) {

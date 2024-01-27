@@ -6,8 +6,8 @@ const toDashBoard = () => {
   router.push({ name: 'dashboard' })
 }
 
-const toEdit = () => {
-  router.push({ name: 'form' })
+const toCreateNew = () => {
+  router.push({ name: 'form', params: { mode: 'new' } })
 }
 </script>
 
@@ -17,7 +17,7 @@ const toEdit = () => {
       <li class="nav-item" @click="toDashBoard">
         LHC Forms Client
       </li>
-      <li class="nav-item" @click="toEdit">
+      <li class="nav-item" @click="toCreateNew">
         + New
       </li>
     </ul>

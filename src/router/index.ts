@@ -22,10 +22,9 @@ const router = createRouter({
       beforeEnter: [loadQuestionnaireResponses]
     },
     {
-      path: '/form',
+      path: '/form/:mode/:responseId?',
       name: 'form',
-      component: LForm,
-      children: []
+      component: LForm
     },
     // {
     //   path: '/about',

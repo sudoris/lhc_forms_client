@@ -17,6 +17,7 @@
   "dependencies": {
     "@types/fhir": "^0.0.39",
     "axios": "^1.6.1",
+    "element-plus": "^2.5.3",
     "lforms": "^34.0.1",
     "pinia": "^2.1.7",
     "uuidv4": "^6.2.13",
