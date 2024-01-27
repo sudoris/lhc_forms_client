@@ -3,12 +3,14 @@ import { useRoute, useRouter } from 'vue-router'
 import { useLFormStore } from '@/stores/lform'
 import { onUnmounted, onMounted, ref, computed, reactive } from 'vue'
 import { loadScript, removeScript } from '@/loadExternalScript'
+import useBreakpoints from '@/hooks/useBreakpoints'
 
 import type { FormInstance } from 'element-plus'
 
 const router = useRouter()
 const route = useRoute()
 const lFormStore = useLFormStore()
+const { width: screenWidth, type: breakpointType } = useBreakpoints()
 
 // loading 3rd party js via script tags:
 // https://stackoverflow.com/questions/70965028/external-script-tag-3rd-party-javascript-with-quasar-and-vue-3
@@ -26,6 +28,13 @@ onMounted(async () => {
 onUnmounted(() => removeScript(lhcAssetsSrc))
 onUnmounted(() => removeScript(lhcFormsSrc))
 onUnmounted(() => removeScript(lformsFhirAllSrc))
+
+const dialogWidth = computed(() => {
+  if (breakpointType.value === 'sm') {
+    return '85%'
+  }
+  return '50%'
+})
 
 const toDashBoard = () => {
   router.push({ name: 'dashboard' })
@@ -79,27 +88,27 @@ const patientForm = reactive<PatientForm>({
 const practionerFormRef = ref(null)
 const practionerValidationRules = reactive({
   practionerFirstName: [
-    { required: true, message: 'Required', trigger: 'blur' }
+    { required: true, message: 'Required', trigger: ['change', 'blur'] }
   ],
   practionerLastName: [
-    { required: true, message: 'Required', trigger: 'blur' }
+    { required: true, message: 'Required', trigger: ['change', 'blur'] }
   ]
 })
 
 const patientFormRef = ref(null)
 const patientValidationRules = reactive({
   firstName: [
-    { required: true, message: 'Required', trigger: ['blur'] }
+    { required: true, message: 'Required', trigger: ['change', 'blur'] }
   ],
   lastName: [
-    { required: true, message: 'Required', trigger: ['blur'] }
+    { required: true, message: 'Required', trigger: ['change', 'blur'] }
   ],
   gender: [
-    { required: true, message: 'Required', trigger: ['blur'] }
+    { required: true, message: 'Required', trigger: ['change', 'blur'] }
   ],
-  // birthDate: [
-  //   { required: true, message: '', trigger: ['change', 'blur'] }
-  // ]
+  birthDate: [
+    { required: true, message: '', trigger: ['change', 'blur'] }
+  ]
 })
 
 const validatePractionerFields = async (formEl: FormInstance | undefined | null) => {
@@ -111,23 +120,17 @@ const validatePractionerFields = async (formEl: FormInstance | undefined | null)
       console.log('missing fields for practioner', fields)
     }
   })
-  .catch((err) => {
-    console.log(err)
-  })
 }
 
 const validatePatientFields = async (formEl: FormInstance | undefined | null) => {
   if (!formEl) return
-  const validateRes = await formEl.validate((valid, fields) => {
+  await formEl.validate((valid, fields) => {
     if (valid) {
       dialogEditType.value = ''
       showFormDialog.value = false
     } else {
       console.log('missing fields for patient', fields)
     }
-  })
-  .catch((err) => {
-    console.log(err)
   })
 }
 
@@ -177,68 +180,50 @@ const resetFormData = () => {
 </script>
 
 <template>
-  <div class="toolbar mb-2">
-    <div class="toolbar-left">
-      <select 
-        v-model="selectedForm" 
-        @change.prevent="setFormDef"
-      >
-        <option disabled value="">Choose a questionnaire</option>
-        <option v-for="questionnaire in lFormStore.fhirQuestionnaires" 
-          :key="questionnaire.id"
-          :value="questionnaire.id"
-        >
-          {{ questionnaire.name || questionnaire.title }}
-        </option>
-      </select>
+  <div class="basic-profile">
+    <div class="basic-profile-card">
+      XXX
     </div>
-    <div class="toolbar-right">
-      <button @click="saveFormData" class="btn btn-primary">Save</button>
-      <button @click="resetFormData" class="btn btn-danger">Reset</button>
+    <div class="basic-profile-card">
+      OOO
     </div>
   </div>
 
-  <!-- <div>
-    <div class="input-group mb-3">
-      <span class="input-group-text" id="practionerFirstName">Practioner First Name</span>
-      <input v-model="practionerFirstName" type="text" class="form-control" placeholder="John" aria-label="First name of practioner" aria-describedby="practionerFirstName">
-    </div>    
-
-    <div class="input-group mb-3">
-      <span class="input-group-text" id="practionerLastName">Practioner Last Name</span>
-      <input v-model="practionerLastName" type="text" class="form-control" placeholder="Smith" aria-label="Last name of practioner" aria-describedby="practionerLastName">
-    </div>  
-
-    <div class="input-group mb-3">
-      <span class="input-group-text" id="firstname">First name</span>
-      <input v-model="firstName" type="text" class="form-control" placeholder="Jane" aria-label="First name" aria-describedby="firstname">
+  <div class="workspace-container">
+    <div class="toolbar mb-2">
+      <div class="toolbar-left">
+        <el-select v-model="selectedForm" @change="setFormDef" placeholder="Questionnaire type">
+          <el-option v-for="questionnaire in lFormStore.fhirQuestionnaires" 
+            :key="questionnaire.id"
+            :label="questionnaire.name || questionnaire.title"
+            :value="questionnaire.id"
+          />
+        </el-select>
+        <!-- <select 
+          v-model="selectedForm" 
+          @change.prevent="setFormDef"
+        >
+          <option disabled value="">Choose a questionnaire</option>
+          <option v-for="questionnaire in lFormStore.fhirQuestionnaires" 
+            :key="questionnaire.id"
+            :value="questionnaire.id"
+          >
+            {{ questionnaire.name || questionnaire.title }}
+          </option>
+        </select> -->
+      </div>
+      
+      <div class="toolbar-right">
+        <el-button type="primary" @click="saveFormData">Save</el-button>
+        <el-button type="danger" @click="resetFormData">Clear</el-button>
+      </div>
     </div>
 
-    <div class="input-group mb-3">
-      <span class="input-group-text" id="lastname">Last name</span>
-      <input v-model="lastName" type="text" class="form-control" placeholder="Doe" aria-label="Last name" aria-describedby="lastname">
-    </div>
-
-    <div class="input-group mb-3">
-      <label class="input-group-text" id="gender">Gender</label>
-      <select class="form-select" v-model="gender" aria-label="Gender" aria-describedby="gender">
-        <option selected>Choose...</option>
-        <option value="male">Male</option>
-        <option value="female">Female</option>
-        <option value="other">Other</option>
-      </select>
-    </div>
-
-    <div class="input-group mb-3">
-      <span class="input-group-text" id="birthDate">birthDate</span>
-      <input v-model="birthDate" type="date" class="form-control" placeholder="YYYY-MM-DD" aria-label="birthDate" aria-describedby="birthDate">
-    </div>
-  </div> -->
-
-  <div v-if="lFormStore.formDef" id="lhcFormContainer"></div>
+    <div v-if="lFormStore.formDef" id="lhcFormContainer"></div>
+  </div>
 
   <!-- Practioner/patient info dialog -->
-  <el-dialog v-model="showFormDialog" :title="formDialogTitle">
+  <el-dialog v-model="showFormDialog" :title="formDialogTitle" :width="dialogWidth">
     <template v-if="dialogEditType == 'practioner'">
       <el-form 
         ref="practionerFormRef"
@@ -247,10 +232,10 @@ const resetFormData = () => {
         label-width="auto"
       >   
         <el-form-item label="First name" prop="practionerFirstName">
-          <el-input v-model="practionerForm.practionerFirstName" autocomplete="off" />
+          <el-input v-model="practionerForm.practionerFirstName" placeholder="First name" autocomplete="off" />
         </el-form-item>
         <el-form-item label="Last name" prop="practionerLastName">
-          <el-input v-model="practionerForm.practionerLastName" autocomplete="off" />
+          <el-input v-model="practionerForm.practionerLastName" placeholder="Last name" autocomplete="off" />
         </el-form-item>
       </el-form>
     </template>
@@ -263,10 +248,10 @@ const resetFormData = () => {
         label-width="auto"
       >   
         <el-form-item label="First name" prop="firstName">
-          <el-input v-model="patientForm.firstName" autocomplete="off" />
+          <el-input v-model="patientForm.firstName" placeholder="First name" autocomplete="off" />
         </el-form-item>
         <el-form-item label="Last name" prop="lastName">
-          <el-input v-model="patientForm.lastName" autocomplete="off" />
+          <el-input v-model="patientForm.lastName" placeholder="Last name" autocomplete="off" />
         </el-form-item>
         <el-form-item label="Gender" prop="gender">
           <el-select v-model="patientForm.gender" placeholder="Gender">
@@ -274,6 +259,14 @@ const resetFormData = () => {
             <el-option label="Female" value="female" />
             <el-option label="Other" value="other" />
           </el-select>
+        </el-form-item>
+        <el-form-item label="Birthdate">
+          <el-date-picker
+            v-model="patientForm.birthDate"
+            type="date"
+            placeholder="YYYY-MM-DD"
+            class="w-100"
+          />
         </el-form-item>
       </el-form>
     </template>
@@ -307,7 +300,7 @@ const resetFormData = () => {
 }
 
 .toolbar-left {
-
+  min-width: 50%
 }
 
 .toolbar-right {
@@ -315,9 +308,12 @@ const resetFormData = () => {
   gap: 0.5rem;
 }
 
-.save-btn {
+.basic-profile {
+  background-color: var(--el-fill-color);
 }
 
-.reset-btn {
+.workspace-container {
+  padding: 0.5rem 0.5rem;
 }
+
 </style>

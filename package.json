@@ -15,6 +15,7 @@
     "gh-deploy-init": "git push origin && git subtree push --prefix dist origin gh-pages"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
     "@types/fhir": "^0.0.39",
     "axios": "^1.6.1",
     "element-plus": "^2.5.3",

@@ -14,8 +14,11 @@ const toCreateNew = () => {
 <template>
   <nav>
     <ul class="primary-nav">
-      <li class="nav-item" @click="toDashBoard">
-        LHC Forms Client
+      <li class="nav-item" @click="toDashBoard">     
+        <el-icon size="large" color="white" style="vertical-align: middle">
+          <Apple />
+        </el-icon>
+        <span>Oink</span>
       </li>
       <li class="nav-item" @click="toCreateNew">
         + New
@@ -23,7 +26,7 @@ const toCreateNew = () => {
     </ul>
   </nav>
 
-  <div class="px-3 pt-2">
+  <div>
     <RouterView />
   </div>
 </template>
@@ -41,5 +44,8 @@ const toCreateNew = () => {
 
 .nav-item {
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 </style>
