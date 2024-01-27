@@ -15,7 +15,7 @@ const toCreateNew = () => {
   <nav>
     <ul class="primary-nav">
       <li class="nav-item" @click="toDashBoard">     
-        <el-icon size="large" color="white" style="vertical-align: middle">
+        <el-icon size="large" color="white">
           <Apple />
         </el-icon>
         <span>Oink</span>

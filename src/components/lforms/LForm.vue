@@ -20,7 +20,6 @@ const lhcFormsSrc = 'https://clinicaltables.nlm.nih.gov/lforms-versions/34.0.0/w
 const lformsFhirAllSrc = 'https://clinicaltables.nlm.nih.gov/lforms-versions/34.0.0/fhir/lformsFHIRAll.min.js'
 onMounted(async () => {
   console.log()
-  await lFormStore.loadFhirQuestionnaires()
   await loadScript(lhcAssetsSrc)
   await loadScript(lhcFormsSrc)
   await loadScript(lformsFhirAllSrc)
@@ -233,18 +232,6 @@ const resetFormData = () => {
             :value="questionnaire.id"
           />
         </el-select>
-        <!-- <select 
-          v-model="selectedForm" 
-          @change.prevent="setFormDef"
-        >
-          <option disabled value="">Choose a questionnaire</option>
-          <option v-for="questionnaire in lFormStore.fhirQuestionnaires" 
-            :key="questionnaire.id"
-            :value="questionnaire.id"
-          >
-            {{ questionnaire.name || questionnaire.title }}
-          </option>
-        </select> -->
       </div>
       
       <div class="toolbar-right">

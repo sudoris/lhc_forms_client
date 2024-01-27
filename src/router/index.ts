@@ -3,6 +3,14 @@ import DashBoard from '@/pages/DashBoard.vue'
 import LForm from '@/components/lforms/LForm.vue'
 import { useLFormStore } from '@/stores/lform'
 
+const loadFhirQuestionnaires = async () => {
+  const lFormStore = useLFormStore()
+
+  await lFormStore.loadFhirQuestionnaires()
+
+  return true
+}
+
 const loadQuestionnaireResponses = async () => {
   const lFormStore = useLFormStore()
 
@@ -35,6 +43,11 @@ const router = createRouter({
     //   component: () => import('../views/AboutView.vue')
     // }
   ]
+})
+
+router.beforeEach(async (to, from) => {
+  await loadFhirQuestionnaires()
+  return true
 })
 
 export default router

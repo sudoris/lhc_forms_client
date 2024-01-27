@@ -18,6 +18,8 @@ export const useLFormStore = defineStore('lFormStore', () => {
 
   const questionnaireResponses = ref([])
   const loadQuestionnaireResponses = async () => {     
+    if (questionnaireResponses.value.length) return
+    
     const res = await api.listQuestionnaireResponses()
     if (res.entry && res.entry.length) {
       questionnaireResponses.value = res.entry.map(item => item.resource)
