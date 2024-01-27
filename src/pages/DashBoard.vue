@@ -1,10 +1,19 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-// import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useLFormStore } from '@/stores/lform'
+import * as dayjs from 'dayjs'
+
+import type { Ref } from 'vue'
 
 const router = useRouter()
 const lFormStore = useLFormStore()
+
+enum GroupBy {
+  patient = 'patient',
+  practioner = 'practioner'
+}
+const groupBy: Ref<string> = ref(GroupBy.patient)
 
 const formatName = (fhirName) => {
   const lastName = fhirName[0].family
@@ -12,77 +21,136 @@ const formatName = (fhirName) => {
   return `${firstName} ${lastName}`
 }
 
+// temporarily concat patient name, gender, birthdate to use as unique identifier
+const getPatientIdentifier = (fhirPatient) => {
+  const fullName = formatName(fhirPatient.name)
+  return `${fullName}${fhirPatient.gender}${fhirPatient.birthDate}`
+}
 
-const tableData = [
-  {
-    date: '2016-05-03',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-02',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-04',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-01',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-]
+const mapQuestionnaires = computed(() => {
+  const questionnaires = {}
+  for (const questionnaire of lFormStore.fhirQuestionnaires) {
+    if (!questionnaires[questionnaire.id]) {
+      questionnaires[questionnaire.id] = questionnaire
+    }
+  }
+  return questionnaires
+})
+
+const getQuestionnaireIdFromUrl = (url) => {
+  return url.substring(url.lastIndexOf('/') + 1);
+}
+
+const responsesByPatient = computed(() => {
+  const groupedResponses = {} 
+  for (const response of lFormStore.questionnaireResponses) {
+    const patientIdentifier = getPatientIdentifier(response.contained[1])
+    if (!groupedResponses[patientIdentifier as keyof typeof groupedResponses]) {
+      groupedResponses[patientIdentifier as keyof typeof groupedResponses] = []
+    }
+    const questionnaireId = getQuestionnaireIdFromUrl(response.questionnaire)
+    const genderCapitalized = response.contained[1].gender.charAt(0).toUpperCase() + response.contained[1].gender.slice(1)
+    const responseTableData = {
+      fullName: formatName(response.contained[1].name),
+      authoringPractioner: formatName(response.contained[0].name),
+      gender: genderCapitalized,
+      birthDate: response.contained[1].birthDate,
+      lastUpdateTime: dayjs(response.meta.lastUpdated).format('YYYY-MM-DD h:mm'),
+      questionnaireType: mapQuestionnaires.value[questionnaireId].name || mapQuestionnaires.value[questionnaireId].title
+    }
+    groupedResponses[patientIdentifier as keyof typeof groupedResponses].push(responseTableData)
+  }
+  return groupedResponses
+})
+
+const handleEdit = (idx, row) => {
+
+}
+
+const handleDelete = (idx, row) => {
+
+}
 
 </script>
 
 <template>
-  <main class="dashboard">
-    <div 
-      v-for="response in lFormStore.questionnaireResponses"
-      class="p-2"
-    >
-      <div>
-        Questionnaire: {{ response.questionnaire }} 
-      </div>
-      <div>
-        Practioner: {{ formatName(response.contained[0].name) }}
-      </div>
-      <div>
-        Patient: {{ formatName(response.contained[1].name) }}
+  <main class="dashboard">     
+    <div class="groupby-container">
+      <div class="groupby-right">
+        <div class="groupby-label">Group by</div>
+        <el-select v-model="groupBy" placeholder="Group by" class="groupby-select">
+          <el-option label="Patient" value="patient" />
+          <el-option label="Author" value="practioner" />
+        </el-select>
       </div>
     </div>
-
-    <!-- <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">First</th>
-          <th scope="col">Last</th>
-          <th scope="col">Handle</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th scope="row">1</th>
-          <td>Mark</td>
-          <td>Otto</td>
-          <td>@mdo</td>
-        </tr>
-        <tr>
-          <th scope="row">2</th>
-          <td>Jacob</td>
-          <td>Thornton</td>
-          <td>@fat</td>
-        </tr>
-        <tr>
-          <th scope="row">3</th>
-          <td colspan="2">Larry the Bird</td>
-          <td>@twitter</td>
-        </tr>
-      </tbody>
-    </table> -->
+    <div
+      v-for="responseList in responsesByPatient"
+      class="response-group"
+    >
+      <div class="patient-name">{{ responseList[0].fullName }}</div>
+      <el-table :data="responseList" stripe fit>
+        <el-table-column prop="questionnaireType" label="Questionnaire Type" width="180" />
+        <el-table-column prop="authoringPractioner" label="Authored By"/>
+        <el-table-column prop="gender" label="Gender" />
+        <el-table-column prop="birthDate" label="Birthdate" />
+        <el-table-column prop="lastUpdateTime" label="Last updated" />
+        <el-table-column label="">
+          <template #default="scope">
+            <el-button size="small" @click="handleEdit(scope.$index, scope.row)"
+              >Edit</el-button
+            >
+            <el-button
+              size="small"
+              @click="handleDelete(scope.$index, scope.row)"
+            >
+              <el-icon size="large" color="red">
+                <Delete />
+              </el-icon>
+            </el-button
+            >
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
   </main>
 </template>
+
+<style scoped>
+.dashboard {
+  padding: .5rem;
+}
+.response-group {
+  margin: 1rem;
+  border: 1px solid var(--el-border-color-light);
+  border-radius: 4px;
+  padding: 1rem;
+  box-shadow: var(--el-box-shadow-light);
+}
+
+.patient-name {
+  font-weight: 500;
+}
+
+.groupby-container {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.75rem;
+}
+.groupby-right {
+  display: flex;
+  align-items: center;
+  gap: .40rem;
+  flex-grow: .15;
+}
+
+.groupby-label {
+  flex-shrink: 0;
+}
+
+@media only screen and (max-width: 678px) {
+  .groupby-right {
+    flex-grow: .40;
+  }
+} 
+</style>
