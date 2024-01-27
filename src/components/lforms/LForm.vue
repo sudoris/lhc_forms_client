@@ -4,6 +4,7 @@ import { useLFormStore } from '@/stores/lform'
 import { onUnmounted, onMounted, ref, computed, reactive, nextTick } from 'vue'
 import { loadScript, removeScript } from '@/loadExternalScript'
 import useBreakpoints from '@/hooks/useBreakpoints'
+import * as dayjs from 'dayjs'
 
 import type { FormInstance } from 'element-plus'
 
@@ -85,6 +86,17 @@ const patientForm = reactive<PatientForm>({
   patientId: ''
 })
 
+const computedBirthDate = computed({
+  // getter
+  get() {
+    return patientForm.birthDate
+  },
+  // setter
+  set(newValue) {
+    patientForm.birthDate = formatDate(newValue)
+  }
+})
+
 const practionerFormRef = ref(null)
 const practionerValidationRules = reactive({
   practionerFirstName: [
@@ -149,6 +161,10 @@ const validatePatientFields = async (formEl: FormInstance | undefined | null) =>
 //   return true
 // })
 
+const formatDate = (date) => {
+  return dayjs(date).format('YYYY-MM-DD')
+}
+
 const selectedForm = ref('')
 const setFormDef = async () => {
   lFormStore.setFormDef(selectedForm.value)
@@ -160,7 +176,7 @@ const setFormDef = async () => {
   }
 }
 
-const saveFormData = () => {
+const saveFormData = async () => {
   const formInput = LForms.Util.getFormFHIRData('QuestionnaireResponse', 'R4')
   const practionerInfo = {
     firstName: practionerForm.practionerFirstName,
@@ -172,7 +188,9 @@ const saveFormData = () => {
     gender: patientForm.gender,
     birthDate: patientForm.birthDate
   }
-  lFormStore.saveFormData(formInput, patientInfo, practionerInfo)
+  await lFormStore.saveFormData(formInput, patientInfo, practionerInfo)
+
+  toDashBoard()
 }
 
 const resetFormData = () => {
@@ -184,10 +202,24 @@ const resetFormData = () => {
 <template>
   <div class="basic-profile">
     <div class="basic-profile-card">
-      XXX
+      <div class="card-item">
+        <div class="card-item-label">Patient</div>
+        <div class="card-item-content">{{ `${patientForm.firstName} ${patientForm.lastName}` }}</div>
+      </div>
+      <div class="card-item">
+        <div class="card-item-label">Gender</div>
+        <div class="card-item-content">{{ `${patientForm.gender.charAt(0).toUpperCase() + patientForm.gender.slice(1)}` }}</div>
+      </div>
+      <div class="card-item">
+        <div class="card-item-label">Birthdate</div>
+        <div class="card-item-content">{{ `${patientForm.birthDate}` }}</div>
+      </div>
     </div>
     <div class="basic-profile-card">
-      OOO
+      <div class="card-item">
+        <div class="card-item-label">Practioner</div>
+        <div class="card-item-content">{{ `${practionerForm.practionerFirstName} ${practionerForm.practionerLastName}` }}</div>
+      </div>      
     </div>
   </div>
 
@@ -216,8 +248,10 @@ const resetFormData = () => {
       </div>
       
       <div class="toolbar-right">
-        <el-button type="primary" @click="saveFormData">Save</el-button>
-        <el-button type="danger" @click="resetFormData">Clear</el-button>
+        <template v-if="lFormStore.formDef">
+          <el-button type="primary" @click="saveFormData">Save</el-button>
+          <el-button type="danger" @click="resetFormData">Clear</el-button>
+        </template>
       </div>
     </div>
 
@@ -225,7 +259,14 @@ const resetFormData = () => {
   </div>
 
   <!-- Practioner/patient info dialog -->
-  <el-dialog v-model="showFormDialog" :title="formDialogTitle" :width="dialogWidth">
+  <el-dialog 
+    v-model="showFormDialog" 
+    :title="formDialogTitle" 
+    :width="dialogWidth" 
+    :close-on-click-modal="false" 
+    :close-on-press-escape="false"
+    :show-close="false"
+  >
     <template v-if="dialogEditType == 'practioner'">
       <el-form 
         ref="practionerFormRef"
@@ -262,9 +303,9 @@ const resetFormData = () => {
             <el-option label="Other" value="other" />
           </el-select>
         </el-form-item>
-        <el-form-item label="Birthdate">
+        <el-form-item label="Birthdate" prop="birhtdate">
           <el-date-picker
-            v-model="patientForm.birthDate"
+            v-model="computedBirthDate"
             type="date"
             placeholder="YYYY-MM-DD"
             class="w-100"
@@ -274,7 +315,7 @@ const resetFormData = () => {
     </template>
     <template v-if="dialogEditType == 'practioner'" #footer>
       <span class="dialog-footer">
-        <el-button @click="toDashBoard">Cancel</el-button>
+        <el-button type="danger" @click="toDashBoard">Cancel</el-button>
         <el-button type="primary" @click="validatePractionerFields(practionerFormRef)">
           Next
         </el-button>
@@ -282,8 +323,8 @@ const resetFormData = () => {
     </template>
     <template v-else-if="dialogEditType == 'patient'" #footer>
       <span class="dialog-footer">
-        <el-button @click="toDashBoard">Cancel</el-button>
-        <el-button @click="dialogEditType = 'practioner'">Back</el-button>
+        <el-button type="info" @click="dialogEditType = 'practioner'">Back</el-button>
+        <el-button type="danger" @click="toDashBoard">Cancel</el-button>      
         <el-button type="primary" @click="validatePatientFields(patientFormRef)">
           Confirm
         </el-button>
@@ -311,7 +352,37 @@ const resetFormData = () => {
 }
 
 .basic-profile {
+  display: flex;
+  padding: 1rem;
+  justify-content: space-around;
   background-color: var(--el-fill-color);
+}
+
+.basic-profile-card {  
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4%;
+  gap: .5rem;
+  width: 100%;
+  background-color: var(--el-bg-color-overlay);
+  border-radius: var(--el-border-radius-base);
+}
+
+.card-item-label {
+  font-weight: 400;
+  font-size: var(--el-font-size-small);
+  color: var(--el-text-color-regular);
+  /* line-height: 20px; */
+}
+
+.card-item-content {
+
+}
+
+.dialog-footer {
+  /* display: flex;
+  justify-content: space-between; */
 }
 
 .workspace-container {

@@ -18,6 +18,7 @@
     "@element-plus/icons-vue": "^2.3.1",
     "@types/fhir": "^0.0.39",
     "axios": "^1.6.1",
+    "dayjs": "^1.11.10",
     "element-plus": "^2.5.3",
     "lforms": "^34.0.1",
     "pinia": "^2.1.7",
