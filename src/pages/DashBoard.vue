@@ -2,7 +2,7 @@
 import { useRouter } from 'vue-router'
 import { computed, ref } from 'vue'
 import { useLFormStore } from '@/stores/lform'
-import * as dayjs from 'dayjs'
+import dayjs from 'dayjs'
 
 import type { Ref } from 'vue'
 
@@ -88,12 +88,12 @@ const handleDelete = (idx, row) => {
       v-for="responseList in responsesByPatient"
       class="response-group"
     >
-      <div class="patient-name">{{ responseList[0].fullName }}</div>
+      <div class="patient-name">{{ responseList[0].fullName }}  |  {{ responseList[0].gender }}  |  {{ responseList[0].birthDate }} (DOB)</div>
       <el-table :data="responseList" stripe fit>
         <el-table-column prop="questionnaireType" label="Questionnaire Type" width="180" />
         <el-table-column prop="authoringPractioner" label="Authored By"/>
-        <el-table-column prop="gender" label="Gender" />
-        <el-table-column prop="birthDate" label="Birthdate" />
+        <!-- <el-table-column prop="gender" label="Gender" />
+        <el-table-column prop="birthDate" label="Birthdate" /> -->
         <el-table-column prop="lastUpdateTime" label="Last updated" />
         <el-table-column label="">
           <template #default="scope">
