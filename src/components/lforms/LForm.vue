@@ -4,7 +4,7 @@ import { useLFormStore } from '@/stores/lform'
 import { onUnmounted, onMounted, ref, computed, reactive, nextTick } from 'vue'
 import { loadScript, removeScript } from '@/loadExternalScript'
 import useBreakpoints from '@/hooks/useBreakpoints'
-import * as dayjs from 'dayjs'
+import dayjs from 'dayjs'
 
 import type { FormInstance } from 'element-plus'
 

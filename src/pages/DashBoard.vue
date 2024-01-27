@@ -2,7 +2,7 @@
 import { useRouter } from 'vue-router'
 import { computed, ref } from 'vue'
 import { useLFormStore } from '@/stores/lform'
-import * as dayjs from 'dayjs'
+import dayjs from 'dayjs'
 
 import type { Ref } from 'vue'
 
