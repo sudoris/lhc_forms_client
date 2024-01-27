@@ -1,7 +1,7 @@
 <script async setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
 import { useLFormStore } from '@/stores/lform'
-import { onUnmounted, onMounted, ref, computed, reactive } from 'vue'
+import { onUnmounted, onMounted, ref, computed, reactive, nextTick } from 'vue'
 import { loadScript, removeScript } from '@/loadExternalScript'
 import useBreakpoints from '@/hooks/useBreakpoints'
 
@@ -150,8 +150,10 @@ const validatePatientFields = async (formEl: FormInstance | undefined | null) =>
 // })
 
 const selectedForm = ref('')
-const setFormDef = () => {
+const setFormDef = async () => {
   lFormStore.setFormDef(selectedForm.value)
+  // ensure that form definition object is set to formDef in lFormStore before we call 'LForms.Util.addFormToPage'
+  await nextTick()
   if (selectedForm.value) {
     const options = { prepopulate: true }
     LForms.Util.addFormToPage(lFormStore.formDef, 'lhcFormContainer', options);
