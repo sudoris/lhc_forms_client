@@ -7,7 +7,8 @@ import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 import './assets/css/lhc.css'
-import './assets/css/bootstrap.min.css'
+// import './assets/css/bootstrap.min.css'
+import './assets/css/bootstrap-grid.css'
 import './assets/css/reset.css'
 import './assets/css/index.css'
 

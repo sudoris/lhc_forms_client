@@ -13,7 +13,8 @@ enum GroupBy {
   patient = 'patient',
   practioner = 'practioner'
 }
-const groupBy: Ref<string> = ref(GroupBy.patient)
+
+const groupBy: Ref<string> = ref('patient')
 
 const formatName = (fhirName) => {
   const lastName = fhirName[0].family
@@ -48,6 +49,7 @@ const responsesByPatient = computed(() => {
     if (!groupedResponses[patientIdentifier as keyof typeof groupedResponses]) {
       groupedResponses[patientIdentifier as keyof typeof groupedResponses] = []
     }
+
     const questionnaireId = getQuestionnaireIdFromUrl(response.questionnaire)
     const genderCapitalized = response.contained[1].gender.charAt(0).toUpperCase() + response.contained[1].gender.slice(1)
     const responseTableData = {
@@ -68,6 +70,10 @@ const handleEdit = (idx, row) => {
 }
 
 const handleDelete = (idx, row) => {
+
+}
+
+const viewForm = (idx, row) => {
 
 }
 
@@ -97,10 +103,14 @@ const handleDelete = (idx, row) => {
         <el-table-column prop="lastUpdateTime" label="Last updated" />
         <el-table-column label="">
           <template #default="scope">
-            <el-button size="small" @click="handleEdit(scope.$index, scope.row)"
+            <el-button size="small" type="success" @click="viewForm(scope.$index, scope.row)"
+              >View</el-button
+            >
+            <el-button size="small" type="primary" @click="handleEdit(scope.$index, scope.row)"
               >Edit</el-button
             >
             <el-button
+              type=""
               size="small"
               @click="handleDelete(scope.$index, scope.row)"
             >
