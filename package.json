@@ -20,6 +20,7 @@
     "element-plus": "^2.5.3",
     "gh-pages": "^6.1.1",
     "lforms": "^34.0.1",
+    "lforms-loader": "^3.0.0",
     "pinia": "^2.1.7",
     "uuidv4": "^6.2.13",
     "vue": "^3.3.4",

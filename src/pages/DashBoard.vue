@@ -2,12 +2,16 @@
 import { useRouter } from 'vue-router'
 import { computed, ref } from 'vue'
 import { useLFormStore } from '@/stores/lform'
+import LFormViewer from '@/components/lforms/LFormViewer.vue'
+import LFormEditor from '@/components/lforms/LFormEditor.vue'
+import useBreakpoints from '@/hooks/useBreakpoints'
 import dayjs from 'dayjs'
 
 import type { Ref } from 'vue'
 
 const router = useRouter()
 const lFormStore = useLFormStore()
+const { width: screenWidth, type: breakpointType } = useBreakpoints()
 
 enum GroupBy {
   patient = 'patient',
@@ -39,12 +43,17 @@ const mapQuestionnaires = computed(() => {
 })
 
 const getQuestionnaireIdFromUrl = (url) => {
+  if (!url) return ''
+
   return url.substring(url.lastIndexOf('/') + 1);
 }
 
 const responsesByPatient = computed(() => {
   const groupedResponses = {} 
   for (const response of lFormStore.questionnaireResponses) {
+    if (!response.questionnaire) {
+      console.log('error finding response questionnaire')
+    }
     const patientIdentifier = getPatientIdentifier(response.contained[1])
     if (!groupedResponses[patientIdentifier as keyof typeof groupedResponses]) {
       groupedResponses[patientIdentifier as keyof typeof groupedResponses] = []
@@ -57,24 +66,37 @@ const responsesByPatient = computed(() => {
       authoringPractioner: formatName(response.contained[0].name),
       gender: genderCapitalized,
       birthDate: response.contained[1].birthDate,
-      lastUpdateTime: dayjs(response.meta.lastUpdated).format('YYYY-MM-DD h:mm'),
-      questionnaireType: mapQuestionnaires.value[questionnaireId].name || mapQuestionnaires.value[questionnaireId].title
+      lastUpdateTimeDisplay: dayjs(response.meta.lastUpdated).format('YYYY-MM-DD h:mm'),
+      lastUpdateTime: response.meta.lastUpdated,
+      questionnaireType: mapQuestionnaires.value[questionnaireId].name || mapQuestionnaires.value[questionnaireId].title,
+      questionnaireId,
+      questionnaireResponseId: response.id
     }
     groupedResponses[patientIdentifier as keyof typeof groupedResponses].push(responseTableData)
   }
   return groupedResponses
 })
 
-const handleEdit = (idx, row) => {
 
+
+const editingResponse = ref({})
+const showEditFormDialog = ref(false)
+const editForm = (idx, row) => {
+  console.log('editing', row)
+  editingResponse.value = row
+  showEditFormDialog.value = true
 }
 
 const handleDelete = (idx, row) => {
 
 }
 
+const viewingResponse = ref({})
+const showViewFormDialog = ref(false)
 const viewForm = (idx, row) => {
-
+  console.log('viewing', row)
+  viewingResponse.value = row
+  showViewFormDialog.value = true
 }
 
 </script>
@@ -100,13 +122,13 @@ const viewForm = (idx, row) => {
         <el-table-column prop="authoringPractioner" label="Authored by"/>
         <!-- <el-table-column prop="gender" label="Gender" />
         <el-table-column prop="birthDate" label="Birthdate" /> -->
-        <el-table-column prop="lastUpdateTime" label="Last updated" />
+        <el-table-column prop="lastUpdateTimeDisplay" label="Last updated" />
         <el-table-column label="">
           <template #default="scope">
             <el-button size="small" type="success" @click="viewForm(scope.$index, scope.row)"
               >View</el-button
             >
-            <el-button size="small" type="primary" @click="handleEdit(scope.$index, scope.row)"
+            <el-button size="small" type="primary" @click="editForm(scope.$index, scope.row)"
               >Edit</el-button
             >
             <el-button
@@ -123,6 +145,24 @@ const viewForm = (idx, row) => {
         </el-table-column>
       </el-table>
     </div>
+
+    <!-- QuestionnaireFormViewer dialog  -->
+    <el-dialog 
+      v-model="showViewFormDialog" 
+      title="" 
+      width="85%"
+    >
+      <LFormViewer :key=viewingResponse.lastUpdateTime :response="viewingResponse" />
+    </el-dialog>
+
+    <!-- QuestionnaireFormEditor dialog  -->
+    <el-dialog 
+      v-model="showEditFormDialog" 
+      title="" 
+      width="85%"
+    >
+      <LFormEditor :key=editingResponse.lastUpdateTime :response="editingResponse" />
+    </el-dialog>
   </main>
 </template>
 

@@ -2,7 +2,7 @@
 import { useRoute, useRouter } from 'vue-router'
 import { useLFormStore } from '@/stores/lform'
 import { onUnmounted, onMounted, ref, computed, reactive, nextTick } from 'vue'
-import { loadScript, removeScript } from '@/loadExternalScript'
+// import { loadScript, removeScript } from '@/loadExternalScript'
 import useBreakpoints from '@/hooks/useBreakpoints'
 import dayjs from 'dayjs'
 
@@ -13,21 +13,21 @@ const route = useRoute()
 const lFormStore = useLFormStore()
 const { width: screenWidth, type: breakpointType } = useBreakpoints()
 
-// loading 3rd party js via script tags:
-// https://stackoverflow.com/questions/70965028/external-script-tag-3rd-party-javascript-with-quasar-and-vue-3
-const lhcAssetsSrc = 'https://clinicaltables.nlm.nih.gov/lforms-versions/34.0.0/webcomponent/assets/lib/zone.min.js'
-const lhcFormsSrc = 'https://clinicaltables.nlm.nih.gov/lforms-versions/34.0.0/webcomponent/lhc-forms.js'
-const lformsFhirAllSrc = 'https://clinicaltables.nlm.nih.gov/lforms-versions/34.0.0/fhir/lformsFHIRAll.min.js'
-onMounted(async () => {
-  console.log()
-  await loadScript(lhcAssetsSrc)
-  await loadScript(lhcFormsSrc)
-  await loadScript(lformsFhirAllSrc)
-})
+// // loading 3rd party js via script tags:
+// // https://stackoverflow.com/questions/70965028/external-script-tag-3rd-party-javascript-with-quasar-and-vue-3
+// const lhcAssetsSrc = 'https://clinicaltables.nlm.nih.gov/lforms-versions/34.0.0/webcomponent/assets/lib/zone.min.js'
+// const lhcFormsSrc = 'https://clinicaltables.nlm.nih.gov/lforms-versions/34.0.0/webcomponent/lhc-forms.js'
+// const lformsFhirAllSrc = 'https://clinicaltables.nlm.nih.gov/lforms-versions/34.0.0/fhir/lformsFHIRAll.min.js'
+// onMounted(async () => {
+//   console.log()
+//   await loadScript(lhcAssetsSrc)
+//   await loadScript(lhcFormsSrc)
+//   await loadScript(lformsFhirAllSrc)
+// })
 
-onUnmounted(() => removeScript(lhcAssetsSrc))
-onUnmounted(() => removeScript(lhcFormsSrc))
-onUnmounted(() => removeScript(lformsFhirAllSrc))
+// onUnmounted(() => removeScript(lhcAssetsSrc))
+// onUnmounted(() => removeScript(lhcFormsSrc))
+// onUnmounted(() => removeScript(lformsFhirAllSrc))
 
 const dialogWidth = computed(() => {
   if (breakpointType.value === 'sm') {
@@ -77,6 +77,7 @@ const practionerForm = reactive<PractionerForm>({
   practionerLastName: '',
   practionerId: ''
 })
+
 const patientForm = reactive<PatientForm>({
   firstName: '',
   lastName: '',
@@ -84,6 +85,11 @@ const patientForm = reactive<PatientForm>({
   birthDate: '',
   patientId: ''
 })
+
+
+const rows = {
+  
+}
 
 const computedBirthDate = computed({
   // getter

@@ -26,6 +26,19 @@ export const useLFormStore = defineStore('lFormStore', () => {
     }
   }
 
+
+  // get the resource change history of a specific questionnaire response instance
+  const getQuestionnaireResponseHistory = async (id: string) => {
+    if (id === undefined || id === null || id === '') return
+    
+    const res = await api.listQuestionnaireResponseHistory(id)
+    if (res.entry && res.entry.length) {
+      return res.entry.map(item => item.resource)
+    }
+
+    return []
+  }
+
   const formDef = ref()
   const setFormDef = (questionnaireId) => {
     formDef.value = fhirQuestionnaires.value.find(questionnaire => questionnaire.id === questionnaireId)
@@ -97,6 +110,22 @@ export const useLFormStore = defineStore('lFormStore', () => {
     console.log(data)
     await api.saveQuestionnaireResponse(formData.value)
   }
+
+  const updateFormData = async (id, data) => {
+    data.id = id
+    await api.updateQuestionnaireResponse(id, data)
+  }
   
-  return { formDef, formData, setFormDef, saveFormData, loadFhirQuestionnaires, fhirQuestionnaires, loadQuestionnaireResponses, questionnaireResponses }
+  return { 
+    formDef, 
+    formData, 
+    setFormDef,
+    saveFormData, 
+    updateFormData,
+    loadFhirQuestionnaires, 
+    fhirQuestionnaires, 
+    loadQuestionnaireResponses, 
+    questionnaireResponses,
+    getQuestionnaireResponseHistory
+  }
 })
