@@ -113,6 +113,7 @@ export const useLFormStore = defineStore('lFormStore', () => {
 
   const updateFormData = async (id, data) => {
     data.id = id
+    console.log('updated form', data)
     await api.updateQuestionnaireResponse(id, data)
   }
   

@@ -1,21 +1,25 @@
 <script setup lang="ts">
 import { loadScript, removeScript } from '@/loadExternalScript'
 // import { loadLForms } from 'lforms-loader'
-import { onBeforeMount, onUnmounted } from 'vue'
+import { onBeforeMount, onMounted, onUnmounted } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import router from './router'
 
 
 // loading 3rd party js via script tags:
 // https://stackoverflow.com/questions/70965028/external-script-tag-3rd-party-javascript-with-quasar-and-vue-3
+// const lhcAssetsSrc = 'https://clinicaltables.nlm.nih.gov/lforms-versions/34.0.0/webcomponent/assets/lib/zone.min.js'
+// const lhcFormsSrc = 'https://clinicaltables.nlm.nih.gov/lforms-versions/34.0.0/webcomponent/lhc-forms.js'
+// const lformsFhirAllSrc = 'https://clinicaltables.nlm.nih.gov/lforms-versions/34.0.0/fhir/lformsFHIRAll.min.js'
 const lhcAssetsSrc = 'https://clinicaltables.nlm.nih.gov/lforms-versions/34.0.0/webcomponent/assets/lib/zone.min.js'
 const lhcFormsSrc = 'https://clinicaltables.nlm.nih.gov/lforms-versions/34.0.0/webcomponent/lhc-forms.js'
 const lformsFhirAllSrc = 'https://clinicaltables.nlm.nih.gov/lforms-versions/34.0.0/fhir/lformsFHIRAll.min.js'
+
 onBeforeMount(async () => {
   await loadScript(lhcAssetsSrc)
   await loadScript(lhcFormsSrc)
   await loadScript(lformsFhirAllSrc)
-  // await loadLForms('34.0.0')
+  // await loadLForms('35.0.4')
 })
 
 onUnmounted(() => removeScript(lhcAssetsSrc))

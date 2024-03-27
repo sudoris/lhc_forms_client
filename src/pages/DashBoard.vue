@@ -49,6 +49,7 @@ const getQuestionnaireIdFromUrl = (url) => {
 }
 
 const responsesByPatient = computed(() => {
+  console.log('response list changed')
   const groupedResponses = {} 
   for (const response of lFormStore.questionnaireResponses) {
     if (!response.questionnaire) {
@@ -61,18 +62,26 @@ const responsesByPatient = computed(() => {
 
     const questionnaireId = getQuestionnaireIdFromUrl(response.questionnaire)
     const genderCapitalized = response.contained[1].gender.charAt(0).toUpperCase() + response.contained[1].gender.slice(1)
-    const responseTableData = {
-      fullName: formatName(response.contained[1].name),
-      authoringPractioner: formatName(response.contained[0].name),
-      gender: genderCapitalized,
-      birthDate: response.contained[1].birthDate,
-      lastUpdateTimeDisplay: dayjs(response.meta.lastUpdated).format('YYYY-MM-DD h:mm'),
-      lastUpdateTime: response.meta.lastUpdated,
-      questionnaireType: mapQuestionnaires.value[questionnaireId].name || mapQuestionnaires.value[questionnaireId].title,
-      questionnaireId,
-      questionnaireResponseId: response.id
+    try {
+      const responseTableData = {
+        fullName: formatName(response.contained[1].name),
+        authoringPractioner: formatName(response.contained[0].name),
+        gender: genderCapitalized,
+        birthDate: response.contained[1].birthDate,
+        lastUpdateTimeDisplay: dayjs(response.meta.lastUpdated).format('YYYY-MM-DD h:mm'),
+        lastUpdateTime: response.meta.lastUpdated,
+        questionnaireType: mapQuestionnaires.value[questionnaireId].name || mapQuestionnaires.value[questionnaireId].title,
+        questionnaireId,
+        questionnaireResponseId: response.id
+      }
+      groupedResponses[patientIdentifier as keyof typeof groupedResponses].push(responseTableData)
+    } catch (err) {
+      console.log(questionnaireId)
+      console.log(response)
+      console.log(response.questionnaire)
+      console.log(err)
     }
-    groupedResponses[patientIdentifier as keyof typeof groupedResponses].push(responseTableData)
+
   }
   return groupedResponses
 })
