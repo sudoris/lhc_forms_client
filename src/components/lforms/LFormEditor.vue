@@ -1,7 +1,7 @@
 <script async setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
 import { useLFormStore } from '@/stores/lform'
-import { onUnmounted, onMounted, ref, computed, reactive, nextTick } from 'vue'
+import { onUnmounted, onMounted, ref, computed, reactive, nextTick, toRefs } from 'vue'
 // import { loadScript, removeScript } from '@/loadExternalScript'
 import useBreakpoints from '@/hooks/useBreakpoints'
 import dayjs from 'dayjs'
@@ -74,14 +74,15 @@ const mergeFormDef = async (fhirData) => {
 const saveFormData = async () => {
   // save updated questionnaire response
   const lhcFormInput = LForms.Util.getFormFHIRData('QuestionnaireResponse', 'R4', 'lhcFormEditorContainer')
-  const payload = { ...currentResponse.value, ...lhcFormInput }
+  currentResponse.value.item = lhcFormInput.item
+  const payload = currentResponse.value
+  // const payload = { ...currentResponseRef, ...lhcFormInput }
   // formInput.author = currentResponse.value.author
   // formInput.contained = currentResponse.value.contained
   // formInput.subject = currentResponse.value.subject
   // formInput.meta.source = currentResponse.value.meta.source
   // formInput.questionnaire = currentResponse.value.questionnaire
   await lFormStore.updateFormData(payload.id, payload)
-
   await lFormStore.loadQuestionnaireResponses()
 }
 </script>

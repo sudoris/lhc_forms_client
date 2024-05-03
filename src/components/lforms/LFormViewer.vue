@@ -85,6 +85,14 @@ const mergeFormDef = async (fhirData) => {
 
 <template>
   <div class="main">
+    <div>
+      <ul>
+        <li v-for="response in responseHistory">
+          Version: {{ response.meta.versionId }} // 
+          Last Updated: {{ response.meta.lastUpdated }}          
+        </li> 
+      </ul>
+    </div>
     <div v-if="currentResponse" class="basic-profile">
       <div class="basic-profile-card">
         <div class="card-item">
