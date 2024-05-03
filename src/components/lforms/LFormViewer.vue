@@ -81,17 +81,51 @@ const mergeFormDef = async (fhirData) => {
   const options = { prepopulate: true }
   LForms.Util.addFormToPage(lFormStore.formDef, 'lhcFormContainer', options)
 }
+
+const renderHistory = computed(() => {
+  if (!responseHistory.value) return []
+  const versionsCount = responseHistory.value.length
+  return responseHistory.value.map((version) => {
+    console.log(versionsCount)
+    if (version.meta.versionId == versionsCount) {
+      version.latest = true
+    }
+    return version
+  })
+})
 </script>
 
 <template>
   <div class="main">
-    <div>
-      <ul>
-        <li v-for="response in responseHistory">
-          Version: {{ response.meta.versionId }} // 
-          Last Updated: {{ response.meta.lastUpdated }}          
+    <div>      
+      <el-dropdown>
+        <span class="el-dropdown-link">
+          Versions
+          <el-icon class="el-icon--right">
+            <arrow-down />
+          </el-icon>
+        </span>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item v-for="response in renderHistory" :key="response.meta.versionId" class="versions-item">
+              <span v-if="response.latest === true">
+                Current
+              </span>
+              <span v-else>
+                Version {{ response.meta.versionId }}
+              </span>
+              <span style="margin-left: 2px;">- Updated on {{ response.meta.lastUpdated }}</span>    
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+      <!-- {{ renderHistory }} -->
+      <!-- <ul>
+        <li class="version-row" v-for="response in renderHistory" :key="response.meta.versionId">
+          <span>Version {{ response.latest === true ? 'Latest' : response.meta.versionId }}</span>
+          <span>Updated {{ response.meta.lastUpdated }}</span>     
         </li> 
-      </ul>
+      </ul> -->
     </div>
     <div v-if="currentResponse" class="basic-profile">
       <div class="basic-profile-card">
@@ -175,6 +209,11 @@ const mergeFormDef = async (fhirData) => {
 
 .main {
   padding: 0.5rem 0.5rem;
+}
+
+.version-item {
+  display: flex;
+  justify-content: space-between;
 }
 
 </style>
